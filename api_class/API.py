@@ -12,7 +12,10 @@ def get_pokemon_data(identifier):
         raise Exception(
             f'Pokemon must be queried by name or ID, got type {type(identifier)}')
 
-    full_url = build_url(f"Pokemon/{identifier}")
+    full_url = build_url(f"pokemon/{identifier}")
     result = requests.get(full_url)
-    # print(result.text)
-    return result
+
+    if not result.ok:
+        raise Exception(result.text)
+
+    return result.json()
