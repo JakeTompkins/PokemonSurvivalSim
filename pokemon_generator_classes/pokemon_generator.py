@@ -1,6 +1,6 @@
 import random
-from ..Pokemon.Pokemon import Pokemon
-from ..API.API import get_pokemon_data
+from pokemon_classes.pokemon import Pokemon
+from api_class.API import get_pokemon_data
 
 
 class PokemonGenerator:
@@ -15,7 +15,7 @@ class PokemonGenerator:
         return get_pokemon_data(pokemon_identifier)
 
     def generate_pokemon(self, number_of_pokemon):
-        pokemon_data = map(self.get_random_pokemon_from_pool,
-                           range(number_of_pokemon))
+        pokemon_data = [self.get_random_pokemon_from_pool()
+                        for x in range(number_of_pokemon)]
 
         return map(lambda x, y: Pokemon(x, {"x": y, "y": y}), pokemon_data, range(number_of_pokemon))

@@ -1,12 +1,9 @@
-from ..PokemonGenerator.PokemonGenerator import PokemonGenerator
-
-
 class Environment:
-    def __init__(self, biome_name, size, number_of_pokemon, pokemon_pool):
+    def __init__(self, biome_name, size, pokemon_generator, number_of_pokemon):
         self.grid_size = size
         self.name = biome_name
         self.number_of_pokemon = number_of_pokemon
-        self.pokemon_generator = PokemonGenerator(pokemon_pool)
+        self.pokemon_generator = pokemon_generator
 
     def build_grid(self):
         self.grid = [[None for col in range(self.grid_size)]
