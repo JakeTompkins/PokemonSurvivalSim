@@ -2,7 +2,7 @@ from ..PokemonGenerator.PokemonGenerator import PokemonGenerator
 
 
 class Environment:
-    def __init__(self, size, biome_name, number_of_pokemon, pokemon_pool):
+    def __init__(self, biome_name, size, number_of_pokemon, pokemon_pool):
         self.grid_size = size
         self.name = biome_name
         self.number_of_pokemon = number_of_pokemon
