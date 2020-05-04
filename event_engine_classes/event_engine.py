@@ -1,25 +1,20 @@
+
 class EventEngine:
     def __init__(self):
         self.listeners = {}
+        self.event_queue = []
 
-    def register_listener(self, event_name, action, pokemon):
-        if self.listeners[event_name] is None:
-          # Create an array if none exists
-            self.listeners[evet_name] = []
-        # Listener object needs to know the action and the pokemon performing it
-        listener = {"action": action, "pokemon": pokemon}
-        self.listeners.append(listener)
-        # allows us to find the listener again if necessary to remove
-        return listener
+    def register_listeners(self, listeners):
+        for listener in listeners:
+            event_name = listener['event_name']
 
-    def emit_event(self, event_name, *args):
-        relevant_listeners = self.listeners[event_name]
+            if self.listeners[event_name] is None:
+              # Create an array if none exists
+                self.listeners[evet_name] = []
 
-        for listener in relevant_listeners:
-            action = listener.action
-            pokemon = listener.pokemon
-            # *args is for when an event involvmes multiple pokemon, i.e. battles. This allows us to pass the second, third etc pokemon to the action
-            return action(pokemon, *args)
+            self.listeners[event_name].append(listener)
+            # allows us to find the listener again if necessary to remove
+        return listeners
 
     def unregister_listener(self, listener):
         for list in self.listeners.values():
@@ -27,3 +22,50 @@ class EventEngine:
                 list.remove(listener)
         # Just to be clear it worked
         return True
+
+    def regiser_event(self, event_name, pokemon, *args):
+        self.event_queue.append([event_name, pokemon, *args])
+
+    def execute_action_for_pokemon(self, listener_array, *args):
+        action_taken = False
+        index = 0
+        while action_taken == False:
+            action = listener_array[index]['action']
+            action_taken = action(*args)
+
+            if action_taken is not True and action_taken is not False:
+                raise Exception('Action needs to return true or false')
+
+            index += 1
+
+            if index == len(listener_array):
+                break
+
+    def group_listeners_by_pokemon(self, listeners):
+        pokemon_ids = {}
+        for listener in listeners:
+            pokemon = listener['pokemon']
+            # This is the id of the object in memory, not the id of the pokemon in the pai
+            pokemon_id = id(pokemon)
+            # Make sure there's an array there if it's the first time this id has been seen
+            if pokemon_ids[pokemon_id] is None:
+                pokemon_ids[pokemon_id] = []
+
+            pokemon_ids[pokemon_id].append(listener)
+        # This returns a 2 dimensional array with listeners grouped by pokemon they were registered by
+        return pokemon_ids.values()
+
+    def sort_listeners_by_priority(self, listeners):
+        return listeners.sort(key=lambda x: x['priority'], reverse=True)
+
+    def emit_events(self):
+        for event_args in self.event_queue:
+            name, pokemon, *args = event_args
+            relevant_listeners = self.listeners[name]
+            grouped_listeners = self.group_listeners_by_pokemon(
+                relevant_listeners)
+            sorted_listeners = [self.sort_listeners_by_priority(
+                listener_arr) for listener_arr in grouped_listeners]
+
+            for listeners_arr in sorted_listeners:
+                self.execute_action_for_pokemon(listeners_arr, pokemon, *args)

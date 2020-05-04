@@ -1,6 +1,15 @@
 from api_class.API import get_pokemon_data
 
 
+class SecondaryStats:
+    def __init__(self, initial_stats, re_calculate):
+        self.stats = initial_stats
+        self.re_calculate = re_calculate
+
+    def level_up(self, genome, level):
+        self.stats = self.re_calculate(genome, level)
+
+
 class SecondaryStatGenerator:
     def __init__(self, pokemon_pool):
         self.pokemon_pool = pokemon_pool
@@ -20,7 +29,10 @@ class SecondaryStatGenerator:
 
         return base_stat + ((flat_increase_per_level * levels_beyond_first) * max_nature_bonus_percent) + 31
 
-    def calculate_stat_maxes_at_level(self, stat_name, level=1):
+    def calculate_stat_maxes_at_level(self, stat_name, level):
+        if not level:
+            level = 1
+
         all_base_stats = [data['stats'] for data in self.pokemon_pool_raw_data]
         base_stats = [next(filter(lambda x: x['stat']['name'] == stat_name, stat_block), None)
                       for stat_block in all_base_stats]
@@ -28,6 +40,7 @@ class SecondaryStatGenerator:
             stat, level) for stat in base_stats]
 
         return max_stats
+
     def get_secondary_stat_percent(self, stat_name, stat_value, level):
         max_possible_for_pool = max(
             self.calculate_stat_maxes_at_level(stat_name, level))
@@ -48,10 +61,13 @@ class SecondaryStatGenerator:
     def calculate_longevity(self, hp, level):
         return self.get_secondary_stat_percent('hp', hp, level)
 
-    def calculate_pluck(self, defense, level):
+    def calculate_self_preservation(self, defense, level):
         return self.get_secondary_stat_percent('defense', defense, level)
 
-    def calculate_secondary_stats(self, genome, level=1):
+    def calculate_secondary_stats(self, genome, level):
+        if not level:
+            level = 1
+
         current_stats = genome['current_stats']
 
         # Get current stats
@@ -68,13 +84,14 @@ class SecondaryStatGenerator:
         sight = calculate_sight(current_special_attack, level)
         camouflage = calculate_camouflage(current_special_defense, level)
         longevity = calculate_longevity(current_hp, level)
-        pluck = calculate_pluck(current_defense, level)
+        self_preservation = calculate_self_preservation(current_defense, level)
 
-        return {
+        # We need to be able to recalculate from the pokemon model wihout creating a new instance of this class, so we can pass the calculation function for use within the instance of SecondaryStats
+        return SecondaryStats({
             "aggression": aggression,
             "movement_speed": movement_speed,
             "sight": sight,
             "camouflage": camouflage,
             "longevity": longevity,
-            "pluck": pluck,
-        }
+            "self_preservation": self_preservation,
+        }, self.calculate_secondary_stats)

@@ -1,7 +1,8 @@
 class Environment:
-    def __init__(self, biome_name, size, pokemon_generator, number_of_pokemon):
+    def __init__(self, biome_name, size, pokemon_generator, number_of_pokemon, event_engine):
         self.grid_size = size
         self.name = biome_name
+        self.event_engine = event_engine
         self.number_of_pokemon = number_of_pokemon
         self.pokemon_generator = pokemon_generator
 
@@ -15,6 +16,8 @@ class Environment:
 
         for pokemon in self.pokemons:
             self.handle_pokemon_position(pokemon)
+            listeners = pokemon.behavior_model.listeners
+            event_engine.register_listeners(listeners)
 
     def get_pokemon_old_position(self, pokemon):
         for row_index, row in enumerate(self.grid):
