@@ -9,6 +9,10 @@ STAT_ACTIONS = {
 class BehaviorModel:
     def __init__(self, pokemon):
         self.pokemon = pokemon
+        self.listeners = [
+            {'event_name': 'round begin', 'action': walk,
+                'pokemon': pokemon, 'priority': 0}
+        ]
         # Might as well build them automatically
         self.create_listeners()
 
