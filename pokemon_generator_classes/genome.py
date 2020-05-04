@@ -1,49 +1,62 @@
-MAX_STATS = {
-    "speed": 504,
-    "special_defense": 614,
-    "special_attack": 535,
-    "defense": 614,
-    "attack": 526,
-    "hp": 714
-}
+from random import randint
 
 
-def calculate_stat_for_level_fifty(base_stat):
-  # Perform appropriate calculation here
+class Genome:
+    def __init__(self, raw_data, nature):
+        self.raw_data
+        self.nature
 
+        # set ivs
+        self.set_ivs()
 
-def calculate_aggression(attack):
-    return (attack / MAX_STATS['attack']) * 100
+        # Set stats
+        self.set_base_stats()
+        self.current_stats = self.base_stats
 
+    def get_random_iv(self):
+        return randint(1, 32)
 
-def calculate_stats(raw_data):
-    raw_stats = raw_data.stats
-    # Get the base stats out of the data from the api
-    base_speed = raw_stats[0].base_stat
-    base_special_defense = raw_stats[1].base_stat
-    base_special_attack = raw_stats[2].base_stat
-    base_defense = raw_stats[3].base_stat
-    base_attack = raw_stats[4].base_stat
-    base_hp = raw_stats[5].base_stat
-    # Calculate stats for the pokemon at lvl 50
-    speed = calculate_stat_for_level_fifty(base_speed)
-    special_defense = calculate_stat_for_level_fifty(base_special_defense)
-    special_attack = calculate_stat_for_level_fifty(base_special_attack)
-    defense = calculate_stat_for_level_fifty(base_defense)
-    attack = calculate_stat_for_level_fifty(base_attack)
-    hp = calculate_stat_for_level_fifty(base_hp)
-    # Calculate composite status based on percentile of lvl 50 stat
-    aggression = calculate_aggression(attack)
-    # Other such calculations go here
+    def set_ivs(self):
+        self.attack_iv = self.get_random_iv()
+        self.special_attack = self.get_random_iv()
+        self.defense_iv = self.get_random_iv()
+        self.special_defense_iv = self.get_random_iv()
+        self.speed = self.get_random_iv()
+        self.hp = self.get_random_iv()
 
-    # Return a dictionary with all of the primary and secondary stats
-    return {
-        "speed": speed,
-        "special_defense": special_defense,
-        "special_attack": special_attack,
-        "defense": defense,
-        "attack": attack,
-        "hp": hp,
-        "aggression": aggression
-        # Add other composite stats in the same fashion
-    }
+    def set_nature_influencesd_stats(self):
+        self.increased_stat = self.nature['increased_stat']['name']
+        self.decreased_stat = self.nature['decreased_stat']['name']
+
+    def set_base_stats(self):
+        raw_data = self.raw_data
+        stats = raw_data['stats']
+
+        base_stats = {}
+        for stat in stats:
+            name = stat['stat']['name']
+            value = stat['base_value']
+
+            iv = self[f'{name}_iv']
+
+            base_stats[name] = value + iv
+
+        self.base_stats = base_stats
+
+    def level_stat(self, stat_name):
+        current_value = self.current_stats[stat_name]
+        base_value = self.base_stats[stat_name]
+
+        flat_increase = base_value * .02
+        nature_increase = self.increased_stat == stat_name
+        nature_decrease = self.decreased_stat == stat_name
+
+        if nature_increase:
+            return current_value + ((flat_increase) * 1.1)
+        elif nature_decrease:
+            return current_value + ((flat_increase) * .9)
+        return current_value + flat_increase
+
+    def level_stats(self):
+        for stat in self.current_stats:
+            current_stats[stat] = self.level_stat(stat)

@@ -19,3 +19,13 @@ def get_pokemon_data(identifier):
         raise Exception(result.text)
 
     return result.json()
+
+
+def get_all_natures():
+    full_url = build_url('nature?limit=25')
+    result = requests.get(full_url)
+
+    if not result.ok:
+        raise Exception(result.text)
+
+    return result.json()['results']
