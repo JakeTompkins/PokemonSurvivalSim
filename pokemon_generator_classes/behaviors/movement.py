@@ -20,27 +20,30 @@ def find_directions_to(mon1, mon2):
 
 def walk(pokemon, update_position):
     DIRECTIONS = ['NORTH, SOUTH, EAST, WEST']
+    distance = pokemon.secondary_stats.stats.movement_speed
 
-    current_position = pokemon.position
-    x = current_position.x
-    y = current_position.y
+    for square in range(distance):
+        current_position = pokemon.position
+        x = current_position.x
+        y = current_position.y
 
-    # If the pokemon has a particular direction, move it there, otherwise move randomly
-    direction = pokemon.direction or DIRECTIONS.choice()
-    speed = pokemon.genome.movement_speed
+        # If the pokemon has a particular direction, move it there, otherwise move randomly
+        direction = pokemon.direction or DIRECTIONS.choice()
 
-    if direction is 'NORTH':
-        y -= speed
-    elif direction is 'SOUTH':
-        y += speed
-    elif direction is 'EAST':
-        x += speed
-    elif direction is 'WEST':
-        x -= speed
+        if direction is 'NORTH':
+            y -= 1
+        elif direction is 'SOUTH':
+            y += 1
+        elif direction is 'EAST':
+            x += 1
+        elif direction is 'WEST':
+            x -= 1
 
-    pokemon.position = {"x": x, "y": y}
+        pokemon.position = {"x": x, "y": y}
 
-    return update_position(pokemon, current_position)
+        update_position(pokemon, current_position)
+
+    return True
 
 
 def stalk(predator, prey, update_position):

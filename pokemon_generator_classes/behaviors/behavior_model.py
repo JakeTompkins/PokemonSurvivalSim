@@ -10,7 +10,7 @@ class BehaviorModel:
     def __init__(self, pokemon):
         self.pokemon = pokemon
         self.listeners = [
-            {'event_name': 'round begin', 'action': walk,
+            {'event_name': 'tick', 'action': walk,
                 'pokemon': pokemon, 'priority': 0}
         ]
         # Might as well build them automatically
@@ -18,7 +18,7 @@ class BehaviorModel:
 
     def create_listeners(self):
         secondary_stats = pokemon.secondary_stats
-        stats = secondary_stats['stats']
+        stats = secondary_stats.stats
 
         for stat_name in STAT_ACTIONS:
             base_actions = STAT_ACTIONS[stat_name]

@@ -45,6 +45,17 @@ class Environment:
         new_x = self.grid_size if new_x > self.grid_size else new_x
 
         self.grid[row][col] = pokemon
+        return self.assess_pokemon_seen(pokemon)
+
+    def assess_pokemon_seen(self, seeing_pokemon):
+        all_pokemon = self.pokemons
+
+        def measure_distance(seen_pokemon):
+            position_1 = seeing_pokemon.position
+            position_2 = seen_pokemon.position
+
+            x_distance = abs(position_1.x - position_2.x)
+            y_distance = abs(position_1.y - position_2.y)
 
     def build(self):
         self.build_grid()

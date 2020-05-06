@@ -1,8 +1,17 @@
+from .ticker import Ticker
 
-class EventEngine:
-    def __init__(self):
+
+class Engine:
+    def __init__(self, interval):
         self.listeners = {}
         self.event_queue = []
+        self.ticker_interval = interval
+        self.ticker = Ticker(interval, self.emit_tick)
+
+        self.ticker.start()
+
+    def emit_tick(self):
+        return self.register_event('tick')
 
     def register_listeners(self, listeners):
         for listener in listeners:
@@ -23,7 +32,7 @@ class EventEngine:
         # Just to be clear it worked
         return True
 
-    def regiser_event(self, event_name, pokemon, *args):
+    def register_event(self, event_name, pokemon, *args):
         self.event_queue.append([event_name, pokemon, *args])
 
     def execute_action_for_pokemon(self, listener_array, *args):
