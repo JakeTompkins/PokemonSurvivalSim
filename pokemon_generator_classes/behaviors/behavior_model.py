@@ -1,8 +1,8 @@
 from .movement import *
 
 STAT_ACTIONS = {
-    'aggression': [{'event_name': 'pokemon seen', 'action': stalk}],
-    'self_preservation': [{'event_name': 'pokemon seen', 'action': flee}]
+    'aggression': [{'event_name': 'spot', 'action': stalk}],
+    'self_preservation': [{'event_name': 'spot', 'action': flee}]
 }
 
 

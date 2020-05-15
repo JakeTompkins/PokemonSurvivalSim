@@ -57,6 +57,23 @@ class Environment:
             x_distance = abs(position_1.x - position_2.x)
             y_distance = abs(position_1.y - position_2.y)
 
+            max_distance = max(x_distance, y_distance)
+            min_distance = min(x_distance, y_distance)
+
+            return min_distance * 1.5 + (max_distance - min_distance)
+
+        perception = seeing_pokemon.secondary_stats.stats['perception']
+
+        for pokemon in all_pokemon:
+          if pokemon == seeing_pokemon:
+            continue
+
+          camouflage = pokemon.secondary_stats.stats['camouflage']
+          distance = measure_distance(seeing_pokemon, pokemon)
+
+          if perception - camouflage >= distance:
+            self.event_engine.register_event('spot', seeing_pokemon, pokemon)
+
     def build(self):
         self.build_grid()
         self.generate_initial_pokemon()
